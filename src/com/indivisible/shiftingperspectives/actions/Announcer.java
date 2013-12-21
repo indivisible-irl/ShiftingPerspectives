@@ -65,7 +65,7 @@ public class Announcer
 
     private void makeAnnouncement()
     {
-        Runnable runAnnounce = new RunAnnounce();
+        RunAnnounce runAnnounce = new RunAnnounce();
         plugin.getServer().getScheduler().runTask(plugin, runAnnounce);
     }
 
