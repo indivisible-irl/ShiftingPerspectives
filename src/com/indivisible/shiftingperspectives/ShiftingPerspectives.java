@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import com.indivisible.shiftingperspectives.actions.Announce;
 
 public final class ShiftingPerspectives
@@ -13,7 +14,7 @@ public final class ShiftingPerspectives
     //// data
 
     private Announce announcer;
-    private int nextTaskID = Integer.MIN_VALUE;
+    protected int nextTaskID = Integer.MIN_VALUE;
     private static final long UPDATE_FREQ = 600L;
 
 
@@ -39,8 +40,7 @@ public final class ShiftingPerspectives
 
     private void startUpdating()
     {
-        //ASK run everything once then queue as normal or just queue from now?
-
+        queueNextUpdateTask();
     }
 
     private void stopUpdating()
@@ -51,17 +51,24 @@ public final class ShiftingPerspectives
         }
     }
 
-    private void performUpdate()
-    {
-        //TODO loop through actions and trigger their triggers
-        long now = this.getServer().getWorld("world").getFullTime();
 
-    }
+    //// update tasks
 
-    private void queueUpdate()
+    private void queueNextUpdateTask()
     {
         Update update = new Update();
-        this.getServer().getScheduler().runTaskLater(this, update, UPDATE_FREQ);
+        BukkitTask nextTask = this.getServer().getScheduler()
+                .runTaskLater(this, update, UPDATE_FREQ);
+        nextTaskID = nextTask.getTaskId();
+    }
+
+    private void performUpdate()
+    {
+        long now = this.getServer().getWorld("world").getFullTime();
+        // trigger each Action and let it decide whether to run or not
+        announcer.triggerAction(now);
+
+        queueNextUpdateTask();
     }
 
 
