@@ -4,7 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
-public class Announcer
+public class Announce
 {
 
     //// data
@@ -20,7 +20,7 @@ public class Announcer
 
     //// constructors & init
 
-    public Announcer(JavaPlugin jPlugin)
+    public Announce(JavaPlugin jPlugin)
     {
         doAnnounce = jPlugin.getConfig().getBoolean("announce.display", false);
         if (doAnnounce)
