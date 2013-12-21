@@ -5,6 +5,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class Announce
+        extends Action
 {
 
     //// data
@@ -12,8 +13,8 @@ public class Announce
     private JavaPlugin plugin;
     private boolean doAnnounce;
     private String announceText;
-    private int interval;
-    //private int lastAnnounceTime;
+    private long interval;
+    private long lastAnnounceTime;
 
     private static final String DEFAULT_ANNOUNCEMENT = "This server is running ShiftingPerspectives. Prepare to have your world view changed!";
 
@@ -43,7 +44,7 @@ public class Announce
         return doAnnounce;
     }
 
-    public int getInterval()
+    public long getInterval()
     {
         return interval;
     }
@@ -51,15 +52,36 @@ public class Announce
 
     //// public methods
 
-    public boolean triggerAction()
+
+    public boolean triggerAction(long worldTicksTotal)
     {
-        makeAnnouncement();
+        if (checkShouldRun(worldTicksTotal))
+        {
+            lastAnnounceTime = worldTicksTotal;
+            makeAnnouncement();
+        }
         return true;
     }
 
+
     //// private methods
 
-    //ASK calculate interval here or make a sep scheduler class to handle all tick calcs?
+    protected boolean checkShouldRun(long worldTicksTotal)
+    {
+        if (lastAnnounceTime == 0L) // default value if long set
+        {
+            return true;
+        }
+        else
+        {
+            if (worldTicksTotal - lastAnnounceTime > interval)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     //// announce task
 
@@ -79,4 +101,5 @@ public class Announce
             plugin.getServer().broadcastMessage(announceText);
         }
     }
+
 }
