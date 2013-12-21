@@ -1,24 +1,21 @@
-#######################################################################################
-##  ShiftingPerspectives Configuration                                               ##
-##  Author: indivisible                                                              ##
-##                                                                                   ##
-##  NOTE: WorldGuard mod is required and must be installed for this mod to function  ##
-#######################################################################################
-
-##################################
-#####   General settings     #####
-##################################
-mod:
-    # Turn the world border shifting on or off with 'true' and 'false' respectively
-    b:mod_enabled:true
-    # Future location of world choice
+###############################################################################
+##                                                                           ##
+##  ShiftingPerspectives Configuration                                       ##
+##  Author: indivisible                                                      ##
+##                                                                           ##
+##  NOTE: WorldGuard is required and must be installed for this mod to work  ##
+##                                                                           ##
+###############################################################################
 
 
-############################
-#####   Shift Timing   #####
-############################
+###############################
+#####    Shift Timing     #####
+###############################
 timing:
-    # Note: 1200 ticks = 1 minute (approx), 24000 = 1 Minecraft day
+    # Note:
+    #   All times are based on in-game times (including 'days').
+    #   1200 ticks = 1 minute (approx), 24000 = 1 Minecraft day
+    #   A laggy server (low TPS) will cause times to lengthen in relation to real life
     
     ## Set the shift mode
     #    Valid options are:
@@ -79,9 +76,9 @@ border:
     i:resize_amount:100
 
 
-#############################
-#####   Announcements   #####
-#############################
+###############################
+#####    Announcements    #####
+###############################
 announce:
     # Control if and when announcements about the shift should happen
     
@@ -89,3 +86,10 @@ announce:
     b:display:false
     # And how often? Value is in ticks. (min 600) 1200 ticks = 1 minute approx
     i:interval:6000
+
+
+###############################
+#####   World settings    #####
+###############################
+worlds:
+    # Future location of world choice
