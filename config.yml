@@ -1,0 +1,91 @@
+#######################################################################################
+##  ShiftingPerspectives Configuration                                               ##
+##  Author: indivisible                                                              ##
+##                                                                                   ##
+##  NOTE: WorldGuard mod is required and must be installed for this mod to function  ##
+#######################################################################################
+
+##################################
+#####   General settings     #####
+##################################
+mod:
+    # Turn the world border shifting on or off with 'true' and 'false' respectively
+    b:mod_enabled:true
+    # Future location of world choice
+
+
+############################
+#####   Shift Timing   #####
+############################
+timing:
+    # Note: 1200 ticks = 1 minute (approx), 24000 = 1 Minecraft day
+    
+    ## Set the shift mode
+    #    Valid options are:
+    #      daily - moves once a day
+    #      days  - moves every X days
+    #      ticks - moves every X ticks
+    s:mode:daily
+    
+    # only used if correct mode set above (shift_timing) 
+    i:days:3
+    i:ticks:6000
+
+
+###############################
+#####   Starting Border   #####
+###############################
+start:
+    # Note: Border will start centred on the world's current spawn location
+    
+    # Starting border shape. 'true' for circular, 'false' for square
+    b:circular_border:true
+    # Size of the border in blocks (diameter or side length as appropriate)
+    i:initial_size:2000
+
+
+###############################
+#####   Border movement   #####
+###############################
+border:
+    # Control how the border changes
+
+    ## There are two separate border movement types:
+    #     Relocate  - physically move the border in a direction
+    #     Resize    - reduce (or increase) the size of the available map
+    #  Both can be activated independently (but one must be enabled)
+    ## distance in blocks to move the world border every iteration
+    
+    ################
+    ##  Relocate  ##
+    ################
+    
+    b:relocate:true
+    i:move_distance:100
+    
+    ## What direction the shift moves in
+    #    Valid options are:
+    #      north, south, east, west, random
+    s:shiftdirection:north
+    
+    ##############
+    ##  Resize  ##
+    ##############
+    
+    # Enable or disable changing of the available map's size
+    b:resize:false
+    # By how much should the map decrease each iteration?
+    # Negative values will increase the size
+    i:resize_amount:100
+
+
+#############################
+#####   Announcements   #####
+#############################
+announce:
+    # Control if and when announcements about the shift should happen
+    
+    # Should the fact that the mod is enabled be announced periodically?
+    b:display:false
+    # And how often? Value is in ticks. 1200 ticks = 1 minute approx
+    i:interval:6000
