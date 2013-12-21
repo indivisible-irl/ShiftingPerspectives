@@ -24,7 +24,7 @@ timing:
     #    Valid options are:
     #      daily - moves once a day
     #      days  - moves every X days
-    #      ticks - moves every X ticks
+    #      ticks - moves every X ticks (min 600)
     s:mode:daily
     
     # only used if correct mode set above (shift_timing) 
@@ -87,5 +87,5 @@ announce:
     
     # Should the fact that the mod is enabled be announced periodically?
     b:display:false
-    # And how often? Value is in ticks. 1200 ticks = 1 minute approx
+    # And how often? Value is in ticks. (min 600) 1200 ticks = 1 minute approx
     i:interval:6000
