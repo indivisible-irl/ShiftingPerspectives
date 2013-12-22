@@ -1,7 +1,8 @@
 package com.indivisible.shiftingperspectives;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+//import org.bukkit.command.Command;
+//import org.bukkit.command.CommandSender;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -23,14 +24,18 @@ public final class ShiftingPerspectives
     @Override
     public void onEnable()
     {
+        this.saveDefaultConfig();
+        this.getServer().getLogger().info("=== onEnable()");
         this.announcer = new Announce(this);
 
         startUpdating();
+        testConfig();
     }
 
     @Override
     public void onDisable()
     {
+        this.getServer().getLogger().info("=== onDisable()");
         stopUpdating();
         this.announcer = null;
     }
@@ -40,15 +45,28 @@ public final class ShiftingPerspectives
 
     private void startUpdating()
     {
+        this.getServer().getLogger().info("=== startUpdating()");
         queueNextUpdateTask();
     }
 
     private void stopUpdating()
     {
+        this.getServer().getLogger().info("=== stopUpdating()");
         if (nextTaskID != Integer.MIN_VALUE)
         {
             this.getServer().getScheduler().cancelTask(nextTaskID);
         }
+    }
+
+    private void testConfig()
+    {
+        this.getServer().getLogger().info("=== CONFIG TESTING ");
+        String test_str = this.getConfig().getString("settings.timing.mode",
+                                                     "DEFAULT VALUE");
+        this.getServer().getLogger().info("settings.timing.mode: " + test_str);
+        test_str = this.getConfig().getString("settings.announce.msg_periodic",
+                                              "DEFAULT VALUE");
+        this.getServer().getLogger().info("settings.announce.msg_periodic: " + test_str);
     }
 
 
@@ -56,6 +74,7 @@ public final class ShiftingPerspectives
 
     private void queueNextUpdateTask()
     {
+        this.getServer().getLogger().info("=== queueNextUpdateTask()");
         Update update = new Update();
         BukkitTask nextTask = this.getServer().getScheduler()
                 .runTaskLater(this, update, UPDATE_FREQ);
@@ -64,9 +83,17 @@ public final class ShiftingPerspectives
 
     private void performUpdate()
     {
-        long now = this.getServer().getWorld("world").getFullTime();
-        // trigger each Action and let it decide whether to run or not
-        announcer.triggerAction(now);
+        this.getServer().getLogger().info("=== performUpdate()");
+        World world = this.getServer().getWorld("world");
+        if (world != null)
+        {
+            long now = this.getServer().getWorld("world").getFullTime();
+            announcer.triggerAction(now);
+        }
+        else
+        {
+            this.getServer().getLogger().warning("=== Unable to access world");
+        }
 
         queueNextUpdateTask();
     }
@@ -88,17 +115,17 @@ public final class ShiftingPerspectives
 
     //// command handling
 
-    @Override
-    public boolean onCommand(CommandSender sender,
-                             Command command,
-                             String label,
-                             String[] args)
-    {
-        // command root to be '/shift <args>'
-
-        //ASK false if not catching command?
-        return false;
-    }
+    //    @Override
+    //    public boolean onCommand(CommandSender sender,
+    //                             Command command,
+    //                             String label,
+    //                             String[] args)
+    //    {
+    //        // command root to be '/shift <args>'
+    //
+    //        //ASK false if not catching command?
+    //        return false;
+    //    }
 
 
 }
