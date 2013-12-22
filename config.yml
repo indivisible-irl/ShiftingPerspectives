@@ -1,95 +1,24 @@
-###############################################################################
-##                                                                           ##
-##  ShiftingPerspectives Configuration                                       ##
-##  Author: indivisible                                                      ##
-##                                                                           ##
-##  NOTE: WorldGuard is required and must be installed for this mod to work  ##
-##                                                                           ##
-###############################################################################
-
-
-###############################
-#####    Shift Timing     #####
-###############################
-timing:
-    # Note:
-    #   All times are based on in-game times (including 'days').
-    #   1200 ticks = 1 minute (approx), 24000 = 1 Minecraft day
-    #   A laggy server (low TPS) will cause times to lengthen in relation to real life
-    
-    ## Set the shift mode
-    #    Valid options are:
-    #      daily - moves once a day
-    #      days  - moves every X days
-    #      ticks - moves every X ticks (min 600)
-    s:mode:daily
-    
-    # only used if correct mode set above (shift_timing) 
-    i:days:3
-    i:ticks:6000
-
-
-###############################
-#####   Starting Border   #####
-###############################
-start:
-    # Note: Border will start centred on the world's current spawn location
-    
-    # Starting border shape. 'true' for circular, 'false' for square
-    b:circular_border:true
-    # Size of the border in blocks (diameter or side length as appropriate)
-    i:initial_size:2000
-
-
-###############################
-#####   Border movement   #####
-###############################
-border:
-    # Control how the border changes
-
-    ## There are two separate border movement types:
-    #     Relocate  - physically move the border in a direction
-    #     Resize    - reduce (or increase) the size of the available map
-    #  Both can be activated independently (but one must be enabled)
-    ## distance in blocks to move the world border every iteration
-    
-    ################
-    ##  Relocate  ##
-    ################
-    
-    b:relocate:true
-    i:move_distance:100
-    
-    ## What direction the shift moves in
-    #    Valid options are:
-    #      north, south, east, west, random
-    s:shiftdirection:north
-    
-    ##############
-    ##  Resize  ##
-    ##############
-    
-    # Enable or disable changing of the available map's size
-    b:resize:false
-    # By how much should the map decrease each iteration?
-    # Negative values will increase the size
-    i:resize_amount:100
-
-
-###############################
-#####    Announcements    #####
-###############################
-announce:
-    # Control if and when announcements about the shift should happen
-    
-    # Should the fact that the mod is enabled be announced periodically?
-    b:display:false
-    # And how often? Value is in ticks. (min 600) 1200 ticks = 1 minute approx
-    i:interval:6000
-
-
-###############################
-#####   World settings    #####
-###############################
-worlds:
-    # Future location of world choice
+settings:
+    timing:
+        mode: daily
+        days: 3
+        ticks: 6000
+    start:
+        circular_border: true
+        initial_size: 2000
+    border:
+        relocate: true
+        shift_distance: 100
+        shift_direction: north
+        resize: false
+        resize_amount: 100
+    announce:
+        periodic: true
+        interval: 1000
+        msg_periodic: This server runs ShiftingPerspectives. Your stuff ain't safe no more!
+        warn_before_shift: true
+        time_before_shift: 1200
+        msg_before_shift: Shift in approx %f mins. Watch out!
+        warn_at_risk_users: true
+        warn_at_risk_time_before: 1200
+        msg_warn_user: You are in an area about to be swallowed up. MOVE YOUR ASS!
