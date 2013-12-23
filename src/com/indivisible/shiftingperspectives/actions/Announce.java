@@ -11,20 +11,36 @@ public class Announce
     //// data
 
     private JavaPlugin plugin;
-    private boolean doAnnounce;
-    private String announceText;
-    private long interval;
-    private long lastAnnounceTime;
 
-    private static final String DEFAULT_ANNOUNCEMENT = "This server is running ShiftingPerspectives. Prepare to have your world view changed!";
+    private boolean doAnnouncePeriodic;
+    private String announcePeriodicMessage;
+    private long announcePeriodicInterval;
+    private long lastPeriodicAnnounceTicks;
+
+    //    private boolean doAnnounceBeforeShift;
+    //    private long announceBeforeShiftTime;
+    //    private String announceBeforeShiftMessage;
+    //
+    //    private boolean doWarnAtRiskUsers;
+    //    private long warnAtRiskUsersTimeBeforeShift;
+    //    private String warnAtRiskUsersMessage;
+
+    private static final String CFG_ANNOUNCE_PERIODIC_ACTIVE = "settings.announce.periodic.active";
+    private static final String CFG_ANNOUNCE_PERIODIC_INTERVAL = "settings.announce.periodic.interval";
+    private static final String CFG_ANNOUNCE_PERIODIC_MESSAGE = "settings.announce.periodic.message";
+
+    private static final String DEFAULT_PERIODIC_MESSAGE = "This server is running ShiftingPerspectives. Prepare to have your world view changed!";
 
 
     //// constructors & init
 
     public Announce(JavaPlugin jPlugin)
     {
-        doAnnounce = jPlugin.getConfig().getBoolean("announce.display", false);
-        if (doAnnounce)
+        doAnnouncePeriodic = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_PERIODIC_ACTIVE,
+                                                            false);
+        jPlugin.getServer().getLogger()
+                .info("=== Periodic Announce: " + doAnnouncePeriodic);
+        if (doAnnouncePeriodic)
         {
             plugin = jPlugin;
             init();
@@ -33,20 +49,23 @@ public class Announce
 
     private void init()
     {
-        interval = plugin.getConfig().getInt("announce.interval");
-        announceText = plugin.getConfig().getString("announce.", DEFAULT_ANNOUNCEMENT);
+        announcePeriodicInterval = plugin.getConfig()
+                .getInt(CFG_ANNOUNCE_PERIODIC_INTERVAL);
+        announcePeriodicMessage = plugin.getConfig()
+                .getString(CFG_ANNOUNCE_PERIODIC_MESSAGE, DEFAULT_PERIODIC_MESSAGE);
     }
 
     //// gets & sets
 
     public boolean isActive()
     {
-        return doAnnounce;
+        return doAnnouncePeriodic;
     }
 
     public long getInterval()
     {
-        return interval;
+        //TODO more for each announce type
+        return announcePeriodicInterval;
     }
 
 
@@ -55,12 +74,22 @@ public class Announce
 
     public boolean triggerAction(long worldTicksTotal)
     {
-        if (checkShouldRun(worldTicksTotal))
+        if (doAnnouncePeriodic)
         {
-            lastAnnounceTime = worldTicksTotal;
-            makeAnnouncement();
+            plugin.getServer().getLogger().info("=== triggerAction() | enabled");
+            if (checkShouldRun(worldTicksTotal))
+            {
+                lastPeriodicAnnounceTicks = worldTicksTotal;
+                makeAnnouncement();
+            }
+            return true;
         }
-        return true;
+        else
+        {
+            plugin.getServer().getLogger().info("=== triggerAction() | not enabled");
+            return false;
+        }
+
     }
 
 
@@ -68,13 +97,13 @@ public class Announce
 
     protected boolean checkShouldRun(long worldTicksTotal)
     {
-        if (lastAnnounceTime == 0L) // default value if long set
+        if (lastPeriodicAnnounceTicks == 0L) // default value if long set
         {
             return true;
         }
         else
         {
-            if (worldTicksTotal - lastAnnounceTime > interval)
+            if (worldTicksTotal - lastPeriodicAnnounceTicks > announcePeriodicInterval)
             {
                 return true;
             }
@@ -87,6 +116,7 @@ public class Announce
 
     private void makeAnnouncement()
     {
+        plugin.getServer().getLogger().info("=== makeAnnouncement()");
         RunAnnounce runAnnounce = new RunAnnounce();
         plugin.getServer().getScheduler().runTask(plugin, runAnnounce);
     }
@@ -98,7 +128,7 @@ public class Announce
         @Override
         public void run()
         {
-            plugin.getServer().broadcastMessage(announceText);
+            plugin.getServer().broadcastMessage(announcePeriodicMessage);
         }
     }
 
