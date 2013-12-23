@@ -1,7 +1,7 @@
 package com.indivisible.shiftingperspectives.actions;
 
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import com.indivisible.shiftingperspectives.ShiftingPerspectives;
 
 /**
  * Action class to announce server-wide that a Shift is to take place a set
@@ -16,7 +16,7 @@ public class AnnounceBeforeShift
 
     //// data
 
-    private JavaPlugin plugin;
+    private ShiftingPerspectives plugin;
     private int taskID = 0;
     private long[] shiftTiming = null;
 
@@ -28,9 +28,9 @@ public class AnnounceBeforeShift
     private static String CFG_ANNOUNCE_TIME = "settings.announce.warn_before_shift.ticks_before";
     private static String CFG_ANNOUNCE_MESSAGE = "settings.announce.warn_before_shift.message";
 
-    private static long DEFAULT_TIME_BEFORE = 2400L;
-    private static String DEFAULT_ANNOUNCE_MESSAGE = "Border shift soon. Grab your gear and move out!!";
-    private static long MINIMUM_TIME_TO_TRIGGER_EARLY_WARN = 600L;
+    private static long DEFAULT_TICKS_BEFORE = 2400L;
+    private static String DEFAULT_ANNOUNCE_MESSAGE = "Border shift soon! Grab your gear and move out!!";
+    private static long MINIMUM_TICKS_TO_TRIGGER_EARLY_WARN = 600L;
 
 
     //// constructors & init
@@ -41,13 +41,15 @@ public class AnnounceBeforeShift
      * 
      * @param jPlugin
      */
-    public AnnounceBeforeShift(JavaPlugin jPlugin)
+    public AnnounceBeforeShift(ShiftingPerspectives jPlugin)
     {
         this.doAnnounceBeforeShift = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_ACTIVE,
                                                                     false);
         if (doAnnounceBeforeShift)
         {
-            init(jPlugin);
+            this.plugin = jPlugin;
+            init();
+            plugin.logInfo("AnnounceBeforeShift enabled");
         }
     }
 
@@ -56,28 +58,29 @@ public class AnnounceBeforeShift
      * 
      * @param jPlugin
      */
-    private void init(JavaPlugin jPlugin)
+    private void init()
     {
-        this.plugin = jPlugin;
         this.announceBeforeShiftTime = plugin.getConfig().getLong(CFG_ANNOUNCE_TIME,
-                                                                  DEFAULT_TIME_BEFORE);
+                                                                  DEFAULT_TICKS_BEFORE);
         this.announceBeforeShiftMessage = plugin.getConfig()
                 .getString(CFG_ANNOUNCE_MESSAGE, DEFAULT_ANNOUNCE_MESSAGE);
     }
 
-
     //// gets & sets
 
+    @Override
     public boolean isEnabled()
     {
         return doAnnounceBeforeShift;
     }
 
+    @Override
     public boolean isActive()
     {
         return taskID != 0;
     }
 
+    @Override
     public void setShiftTiming(long[] shiftTiming)
     {
         this.shiftTiming = shiftTiming;
@@ -86,15 +89,19 @@ public class AnnounceBeforeShift
 
     //// public methods
 
+    @Override
     public boolean start()
     {
         if (isEnabled())
         {
-            RunAnnounce runAnnounce = new RunAnnounce();
+            plugin.logInfo("AnnounceBeforeShift.start()");
+            RunAnnounceBeforeShift runAnnounce = new RunAnnounceBeforeShift();
             long ticksUntilNextShift = shiftTiming[0];
-            if (ticksUntilNextShift - announceBeforeShiftTime <= MINIMUM_TIME_TO_TRIGGER_EARLY_WARN)
+            if (ticksUntilNextShift - announceBeforeShiftTime <= MINIMUM_TICKS_TO_TRIGGER_EARLY_WARN)
             {
+                // run announce immediately
                 plugin.getServer().getScheduler().runTask(plugin, runAnnounce);
+                // queue task for following Shift
                 long newNextRun = shiftTiming[0] + shiftTiming[1]
                         - announceBeforeShiftTime;
                 taskID = plugin
@@ -116,8 +123,13 @@ public class AnnounceBeforeShift
                                                            - announceBeforeShiftTime,
                                                    shiftTiming[1]);
             }
+            return true;
         }
-        return false;
+        else
+        {
+            plugin.logInfo("AnnounceBeforeShift.start(), skipping - inactive");
+            return false;
+        }
     }
 
     @Override
@@ -125,11 +137,16 @@ public class AnnounceBeforeShift
     {
         if (isActive())
         {
+            plugin.logInfo("AnnounceBeforeShift.stop()");
             plugin.getServer().getScheduler().cancelTask(taskID);
             taskID = 0;
             return true;
         }
-        return false;
+        else
+        {
+            plugin.logInfo("AnnounceBeforeShift.stop(), skipping - inactive");
+            return false;
+        }
     }
 
     @Override
@@ -149,13 +166,14 @@ public class AnnounceBeforeShift
      * @author indiv
      * 
      */
-    private class RunAnnounce
+    private class RunAnnounceBeforeShift
             extends BukkitRunnable
     {
 
         @Override
         public void run()
         {
+            plugin.logInfo("RunAnnounceBeforeShift");
             plugin.getServer().broadcastMessage(announceBeforeShiftMessage);
         }
     }

@@ -1,29 +1,29 @@
 settings:
     timing:
-        mode: daily
-        days: 1
-        ticks: 2000
+        mode: daily                 # valid options are: daily, days, ticks
+        days: 1                     # shift every x days. only used if mode = days
+        ticks: 2000                 # shift every x ticks. only used if mode = ticks
     border:
         start:
-            circular_border: true
-            initial_size: 2000
+            circular_border: true   # true = circular, false = square
+            initial_size: 2000      # starting border diameter or side length
         relocate:
-            active: true
-            distance: 100
-            direction: north
+            active: true            # do shift the border position
+            distance: 100           # how far to move the border every shift
+            direction: north        # direction to move the border
         resize:
-            active: false
-            amount: 100
+            active: true            # do resize the border
+            amount: 100             # blocks to resize by. negative values increase the border
     announce:
         periodic:
-            active: true
-            interval: 1000
+            active: true            # announce to server periodically that the plugin is installed
+            interval: 1000          # announce every x ticks
             message: This server runs ShiftingPerspectives. Your stuff isn't safe anymore...
         warn_before_shift:
-            active: true
-            ticks_before: 1200
+            active: true            # warn server that a border shift is coming
+            ticks_before: 1200      # warn x ticks before the shift
             message: Shift coming soon. Watch out!
         warn_at_risk_users:
-            active: true
-            ticks_before: 1000
+            active: true            # warns players near areas at risk of disappearing a shift is coming 
+            ticks_before: 1000      # warn players x ticks before shift
             message: You are about to be Shifted! Grab your stuff and move %s!

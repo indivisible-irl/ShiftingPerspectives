@@ -1,7 +1,7 @@
 package com.indivisible.shiftingperspectives.actions;
 
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import com.indivisible.shiftingperspectives.ShiftingPerspectives;
 
 /**
  * Class to announce server-wide in game that the plugin is installed.
@@ -15,7 +15,7 @@ public class AnnouncePeriodic
 
     //// data
 
-    private JavaPlugin plugin = null;
+    private ShiftingPerspectives plugin = null;
 
     private boolean doAnnouncePeriodic;
     private String announcePeriodicMessage;
@@ -36,13 +36,14 @@ public class AnnouncePeriodic
      * 
      * @param jPlugin
      */
-    public AnnouncePeriodic(JavaPlugin jPlugin)
+    public AnnouncePeriodic(ShiftingPerspectives jPlugin)
     {
         doAnnouncePeriodic = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_ACTIVE, false);
         if (doAnnouncePeriodic)
         {
             plugin = jPlugin;
             init();
+            plugin.logInfo("AnnouncePeriodic enabled");
         }
     }
 
@@ -58,11 +59,13 @@ public class AnnouncePeriodic
 
     //// gets
 
+    @Override
     public boolean isEnabled()
     {
         return doAnnouncePeriodic;
     }
 
+    @Override
     public boolean isActive()
     {
         return taskID != 0;
@@ -71,10 +74,10 @@ public class AnnouncePeriodic
 
     //// public methods
 
+    @Override
     public boolean start()
     {
-        plugin.getServer().getLogger()
-                .info("[ShiftingPerspectives] AnnouncePeriodic.start()");
+        plugin.logInfo("AnnouncePeriodic.start()");
         if (doAnnouncePeriodic && announcePeriodicInterval != 0L)
         {
             RunAnnounce runAnnounce = new RunAnnounce();
@@ -87,22 +90,31 @@ public class AnnouncePeriodic
                                                announcePeriodicInterval);
             return true;
         }
-        return false;
+        else
+        {
+            plugin.logInfo("AnnouncePeriodic.start(), skipping - inactive");
+            return false;
+        }
     }
 
+    @Override
     public boolean stop()
     {
-        plugin.getServer().getLogger()
-                .info("[ShiftingPerspectives] AnnouncePeriodic.stop()");
+        plugin.logInfo("AnnouncePeriodic.stop()");
         if (isActive())
         {
             plugin.getServer().getScheduler().cancelTask(taskID);
             taskID = 0;
             return true;
         }
-        return false;
+        else
+        {
+            plugin.logInfo("AnnouncePeriodic.stop(), skipping - inactive");
+            return false;
+        }
     }
 
+    @Override
     public boolean reset()
     {
         stop();

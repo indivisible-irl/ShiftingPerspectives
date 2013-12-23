@@ -22,6 +22,7 @@ public final class ShiftingPerspectives
     protected int taskID = 0;
     private List<Action> actions;
 
+    private static final String LOG_STRING = "[>>>>>>] %s";
     private static final long UPDATE_FREQ = 800L;
     private static final long TOLLERENCE = 100L;
 
@@ -105,11 +106,39 @@ public final class ShiftingPerspectives
      */
     private void resetTasks()
     {
-        this.getServer().getLogger().info("[ShiftingPerspectives] allActions.reset()");
+        this.logInfo("allActions.reset()");
         for (Action action : actions)
         {
             action.reset();
         }
+    }
+
+
+    //// logging and messaging
+
+    /**
+     * Write a message to the server log of INFO level
+     * 
+     * @param msg
+     */
+    public void logInfo(String msg)
+    {
+        this.getServer().getLogger().info(String.format(LOG_STRING, msg));
+    }
+
+    /**
+     * Write a message to the server log of WARNING level
+     * 
+     * @param msg
+     */
+    public void logWarn(String msg)
+    {
+        this.getServer().getLogger().warning(String.format(LOG_STRING, msg));
+    }
+
+    public void sayToServer(String msg)
+    {
+        this.getServer().broadcastMessage(msg);
     }
 
 
@@ -125,10 +154,10 @@ public final class ShiftingPerspectives
             extends BukkitRunnable
     {
 
-        private JavaPlugin plugin;
+        private ShiftingPerspectives plugin;
         private long expectedTime = 0;
 
-        public TimeMonitor(JavaPlugin jPlugin)
+        public TimeMonitor(ShiftingPerspectives jPlugin)
         {
             this.plugin = jPlugin;
             expectedTime = jPlugin.getServer().getWorld("world").getFullTime()
@@ -141,6 +170,7 @@ public final class ShiftingPerspectives
             long currentFullTime = plugin.getServer().getWorld("world").getFullTime();
             if (currentFullTime - expectedTime > TOLLERENCE)
             {
+                plugin.logInfo("TimeMonitor: Caught time discrepency. Resetting Action Tasks");
                 resetTasks();
                 expectedTime = currentFullTime + UPDATE_FREQ;
             }

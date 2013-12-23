@@ -1,7 +1,7 @@
 package com.indivisible.shiftingperspectives.actions;
 
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import com.indivisible.shiftingperspectives.ShiftingPerspectives;
 
 /**
  * Action class to announce to users that are at risk of getting caught in an
@@ -10,13 +10,13 @@ import org.bukkit.scheduler.BukkitRunnable;
  * @author indiv
  * 
  */
-public class WarnAtRiskUsers
+public class WarnAtRiskPlayers
         extends ShiftSubAction
 {
 
     //// data
 
-    private JavaPlugin plugin;
+    private ShiftingPerspectives plugin;
     private long[] shiftTiming = null;
 
     private boolean doAnnounceAtRisk;
@@ -40,13 +40,14 @@ public class WarnAtRiskUsers
      * @param jPlugin
      * @param shiftBorder
      */
-    public WarnAtRiskUsers(JavaPlugin jPlugin, ShiftBorder shiftBorder)
+    public WarnAtRiskPlayers(ShiftingPerspectives jPlugin)
     {
         doAnnounceAtRisk = jPlugin.getConfig().getBoolean(CFG_WARN_ACTIVE, true);
         if (doAnnounceAtRisk)
         {
             this.plugin = jPlugin;
             init();
+            plugin.logInfo("WarnAtRiskPlayers enabled");
         }
     }
 
@@ -85,6 +86,7 @@ public class WarnAtRiskUsers
     {
         if (isEnabled())
         {
+            plugin.logInfo("WarnAtRiskPlayer.start()");
             RunAnnounce runAnnounce = new RunAnnounce();
             long ticksUntilNextShift = shiftTiming[0];
             if (ticksUntilNextShift - warnBeforeTicks <= MINIMUM_TIME_TO_TRIGGER_EARLY_WARN)
@@ -109,19 +111,29 @@ public class WarnAtRiskUsers
                                                    shiftTiming[0] - warnBeforeTicks,
                                                    shiftTiming[1]);
             }
+            return true;
         }
-        return false;
+        else
+        {
+            plugin.logInfo("WarnAtRiskPlayer.start(), skipping - inactive");
+            return false;
+        }
     }
 
     public boolean stop()
     {
         if (isActive())
         {
+            plugin.logInfo("WarnAtRiskPlayer.stop()");
             plugin.getServer().getScheduler().cancelTask(taskID);
             taskID = 0;
             return true;
         }
-        return false;
+        else
+        {
+            plugin.logInfo("WarnAtRiskPlayer.stop(), skipping - inactive");
+            return false;
+        }
     }
 
     public boolean reset()

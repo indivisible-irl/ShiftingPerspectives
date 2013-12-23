@@ -2,8 +2,8 @@ package com.indivisible.shiftingperspectives.actions;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import com.indivisible.shiftingperspectives.ShiftingPerspectives;
 
 
 /**
@@ -19,7 +19,7 @@ public class ShiftBorder
 
     //// data
 
-    private JavaPlugin plugin;
+    private ShiftingPerspectives plugin;
     private List<ShiftSubAction> announceActions;
     private int taskID = 0;
     private int lastDayRun;
@@ -60,24 +60,37 @@ public class ShiftBorder
      * 
      * @param jPlugin
      */
-    public ShiftBorder(JavaPlugin jPlugin)
+    public ShiftBorder(ShiftingPerspectives jPlugin)
     {
         this.doRelocate = jPlugin.getConfig().getBoolean(CFG_RELOCATE_ACTIVE, false);
         this.doResize = jPlugin.getConfig().getBoolean(CFG_RESIZE_ACTIVE, false);
         if (doRelocate || doResize)
         {
             this.plugin = jPlugin;
-            this.announceActions = new ArrayList<ShiftSubAction>();
+            init();
+            plugin.logInfo("ShiftBorder enabled");
+        }
+    }
 
-            initTiming();
-            if (doRelocate)
-            {
-                initRelocate();
-            }
-            if (doResize)
-            {
-                initResize();
-            }
+    /**
+     * Topmost initialisation for data members. Calls the appropriate
+     * secondary init methods based on configuration.
+     */
+    private void init()
+    {
+        // Add ShiftSubActions to List to couple them with this parent Action.
+        this.announceActions = new ArrayList<ShiftSubAction>();
+        this.announceActions.add(new AnnounceBeforeShift(plugin));
+        this.announceActions.add(new WarnAtRiskPlayers(plugin));
+
+        initTiming();
+        if (doRelocate)
+        {
+            initRelocate();
+        }
+        if (doResize)
+        {
+            initResize();
         }
     }
 
@@ -101,9 +114,7 @@ public class ShiftBorder
         }
         else
         {
-            plugin.getServer()
-                    .getLogger()
-                    .warning("[Shifting Perspectives] Incorrect Shift 'mode' set. Disabling plugin");
+            plugin.logWarn("Incorrect Shift 'timing.mode' set. Disabling plugin");
             plugin.onDisable();
         }
     }
@@ -113,8 +124,7 @@ public class ShiftBorder
      */
     private void initModeDaily()
     {
-        plugin.getServer().getLogger()
-                .info("[Shifting Perspectives] Enabling daily Shifts");
+        plugin.logInfo("Enabling Shifts (Daily)");
     }
 
     /**
@@ -125,17 +135,13 @@ public class ShiftBorder
         this.shiftTimingDays = plugin.getConfig().getInt(CFG_TIMING_DAYS);
         if (shiftTimingDays == 0)
         {
-            plugin.getServer()
-                    .getLogger()
-                    .warning("[Shifting Perspectives] Incorrect 'timing.days' setting. Disabling plugin");
+            plugin.logWarn("Incorrect 'timing.days' setting. Disabling plugin");
             plugin.onDisable();
         }
         else
         {
-            plugin.getServer()
-                    .getLogger()
-                    .info(String.format("[Shifting Perspectives] Enabled multi-day Shifts. Run every %d days",
-                                        shiftTimingDays));
+            plugin.logInfo(String.format("Enabled Shift (Multi-Day). Run every %d days",
+                                         shiftTimingDays));
         }
     }
 
@@ -147,17 +153,14 @@ public class ShiftBorder
         this.shiftTimingTicks = plugin.getConfig().getLong(CFG_TIMING_TICKS, 0L);
         if (shiftTimingTicks == 0L)
         {
-            plugin.getServer()
-                    .getLogger()
-                    .warning("[Shifting Perspectives] Incorrect 'timing.ticks' setting. Disabling plugin");
+            plugin.logWarn("Incorrect 'timing.ticks' setting. Disabling plugin");
             plugin.onDisable();
         }
         else
         {
-            plugin.getServer()
-                    .getLogger()
-                    .info(String.format("[Shifting Perspectives] Enabling custom tick Shifts. Run every %d ticks",
-                                        shiftTimingTicks));
+            plugin.logInfo(String
+                    .format("Enabling custom tick Shifts. Run every %d ticks",
+                            shiftTimingTicks));
         }
     }
 
@@ -166,7 +169,7 @@ public class ShiftBorder
      */
     private void initRelocate()
     {
-        this.relocateDistance = plugin.getConfig().getInt(CFG_RELOCATE_DISTANCE);   // 0 if not found
+        this.relocateDistance = plugin.getConfig().getInt(CFG_RELOCATE_DISTANCE, 0);
         this.relocateDirection = plugin.getConfig().getString(CFG_RELOCATE_DIRECTION,
                                                               DEFAULT_RELOCATE_DIRECTION);
     }
@@ -177,7 +180,7 @@ public class ShiftBorder
      */
     private void initResize()
     {
-        this.resizeAmount = plugin.getConfig().getInt(CFG_RESIZE_AMOUNT);           // 0 if not found
+        this.resizeAmount = plugin.getConfig().getInt(CFG_RESIZE_AMOUNT, 0);
     }
 
 
@@ -197,6 +200,7 @@ public class ShiftBorder
     {
         if (isEnabled())
         {
+            plugin.logInfo("ShiftBorder.start()");
             long[] triggerTimes = null;
             if (isModeDaily())
             {
@@ -228,13 +232,18 @@ public class ShiftBorder
 
             return true;
         }
-        return false;
+        else
+        {
+            plugin.logInfo("ShiftBorder.start(), skipped - inactive");
+            return false;
+        }
     }
 
     public boolean stop()
     {
         if (isActive())
         {
+            plugin.logInfo("ShiftBorder.stop()");
             plugin.getServer().getScheduler().cancelTask(taskID);
             taskID = 0;
             // loop through the announce sub-actions and cancel their tasks if appropriate.
@@ -244,7 +253,11 @@ public class ShiftBorder
             }
             return true;
         }
-        return false;
+        else
+        {
+            plugin.logInfo("ShiftBorder.stop(), skipped - inactive");
+            return false;
+        }
     }
 
     public boolean reset()
@@ -446,10 +459,10 @@ public class ShiftBorder
         @Override
         public void run()
         {
-            plugin.getServer().getLogger().info("[Shifting Perspectives] RunShift.run()");
+            plugin.logInfo("RunShift.run()");
             performShift();
             resetSpawnLocation();
-            // update lastRun members for future use by reset() (Not needed for Daily)
+            // update appropriate lastRun* member for future use by reset() (Not needed for Daily)
             if (isModeDays())
             {
                 lastDayRun = (int) (plugin.getServer().getWorld("world").getFullTime() / TICKS_FULL_DAY);
