@@ -4,7 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
-public class Announce
+public class AnnouncePeriodic
         extends Action
 {
 
@@ -17,26 +17,22 @@ public class Announce
     private long announcePeriodicInterval;
     private long lastPeriodicAnnounceTicks;
 
-    //    private boolean doAnnounceBeforeShift;
-    //    private long announceBeforeShiftTime;
-    //    private String announceBeforeShiftMessage;
-    //
     //    private boolean doWarnAtRiskUsers;
     //    private long warnAtRiskUsersTimeBeforeShift;
     //    private String warnAtRiskUsersMessage;
 
-    private static final String CFG_ANNOUNCE_PERIODIC_ACTIVE = "settings.announce.periodic.active";
-    private static final String CFG_ANNOUNCE_PERIODIC_INTERVAL = "settings.announce.periodic.interval";
-    private static final String CFG_ANNOUNCE_PERIODIC_MESSAGE = "settings.announce.periodic.message";
+    private static final String CFG_ANNOUNCE_ACTIVE = "settings.announce.periodic.active";
+    private static final String CFG_ANNOUNCE_INTERVAL = "settings.announce.periodic.interval";
+    private static final String CFG_ANNOUNCE_MESSAGE = "settings.announce.periodic.message";
 
-    private static final String DEFAULT_PERIODIC_MESSAGE = "This server is running ShiftingPerspectives. Prepare to have your world view changed!";
+    private static final String DEFAULT_ANNOUNCE_MESSAGE = "This server is running ShiftingPerspectives. Prepare to have your world view changed!";
 
 
     //// constructors & init
 
-    public Announce(JavaPlugin jPlugin)
+    public AnnouncePeriodic(JavaPlugin jPlugin)
     {
-        doAnnouncePeriodic = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_PERIODIC_ACTIVE,
+        doAnnouncePeriodic = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_ACTIVE,
                                                             false);
         jPlugin.getServer().getLogger()
                 .info("=== Periodic Announce: " + doAnnouncePeriodic);
@@ -50,9 +46,9 @@ public class Announce
     private void init()
     {
         announcePeriodicInterval = plugin.getConfig()
-                .getInt(CFG_ANNOUNCE_PERIODIC_INTERVAL);
+                .getInt(CFG_ANNOUNCE_INTERVAL);
         announcePeriodicMessage = plugin.getConfig()
-                .getString(CFG_ANNOUNCE_PERIODIC_MESSAGE, DEFAULT_PERIODIC_MESSAGE);
+                .getString(CFG_ANNOUNCE_MESSAGE, DEFAULT_ANNOUNCE_MESSAGE);
     }
 
     //// gets & sets

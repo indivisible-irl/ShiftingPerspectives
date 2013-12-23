@@ -6,7 +6,7 @@ import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import com.indivisible.shiftingperspectives.actions.Announce;
+import com.indivisible.shiftingperspectives.actions.AnnouncePeriodic;
 
 public final class ShiftingPerspectives
         extends JavaPlugin
@@ -14,7 +14,7 @@ public final class ShiftingPerspectives
 
     //// data
 
-    private Announce announcer;
+    private AnnouncePeriodic announcer;
     protected int nextTaskID = Integer.MIN_VALUE;
     private static final long UPDATE_FREQ = 600L;
 
@@ -26,7 +26,7 @@ public final class ShiftingPerspectives
     {
         this.saveDefaultConfig();
         this.getServer().getLogger().info("=== onEnable()");
-        this.announcer = new Announce(this);
+        this.announcer = new AnnouncePeriodic(this);
 
         startUpdating();
         //        testConfig();
