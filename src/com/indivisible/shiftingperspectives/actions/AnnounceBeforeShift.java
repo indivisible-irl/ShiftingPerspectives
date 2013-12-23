@@ -135,7 +135,7 @@ public class AnnounceBeforeShift
     @Override
     public boolean stop()
     {
-        if (isActive())
+        if (isEnabled() && isActive())
         {
             plugin.logInfo("AnnounceBeforeShift.stop()");
             plugin.getServer().getScheduler().cancelTask(taskID);

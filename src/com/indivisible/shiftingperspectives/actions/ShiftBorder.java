@@ -241,7 +241,7 @@ public class ShiftBorder
 
     public boolean stop()
     {
-        if (isActive())
+        if (isEnabled() && isActive())
         {
             plugin.logInfo("ShiftBorder.stop()");
             plugin.getServer().getScheduler().cancelTask(taskID);
@@ -408,6 +408,7 @@ public class ShiftBorder
         {
             performShiftResize();
         }
+        resetSpawnLocation();
     }
 
     /**
@@ -416,11 +417,9 @@ public class ShiftBorder
      */
     private void performShiftRelocate()
     {
-        plugin.getServer()
-                .getLogger()
-                .info(String.format("[Shifting Perspectives] Relocating border %d blocks %s",
-                                    relocateDistance,
-                                    relocateDirection));
+        plugin.logInfo(String.format("Relocating border %d blocks %s",
+                                     relocateDistance,
+                                     relocateDirection));
         //TODO make and call class to transpose the world border
     }
 
@@ -430,17 +429,18 @@ public class ShiftBorder
      */
     private void performShiftResize()
     {
-        plugin.getServer()
-                .getLogger()
-                .info(String.format("[Shifting Perspectives] Resizing border by %d blocks",
-                                    resizeAmount));
+        plugin.logInfo(String
+                .format("[Shifting Perspectives] Resizing border by %d blocks",
+                        resizeAmount));
         //TODO make and call class to resize the world border
     }
 
     private void resetSpawnLocation()
     {
+        plugin.logInfo("Repositioning spawn location");
         //TODO calculate the new centre of the accessible world and set the spawn point there.
         //REM get the max y-value of the location.
+        //REM check for lava or other hazard
     }
 
 

@@ -21,7 +21,7 @@ settings:
             message: This server runs ShiftingPerspectives. Nowhere is safe anymore...
         warn_before_shift:
             active: true            # warn server that a border shift is coming
-            ticks_before: 1200      # warn x ticks before the shift
+            ticks_before: 2000      # warn x ticks before the shift
             message: Shift coming soon. Watch out!
         warn_at_risk_users:
             active: true            # warns players near areas at risk of disappearing a shift is coming 

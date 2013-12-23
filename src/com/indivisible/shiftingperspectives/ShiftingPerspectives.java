@@ -35,6 +35,7 @@ public final class ShiftingPerspectives
     {
         this.logInfo("onEnable()");
         this.saveDefaultConfig();
+        //ASK ^ reloads configs from file?? doesn't seem to
 
         actions = new ArrayList<Action>();
         actions.add(new AnnouncePeriodic(this));

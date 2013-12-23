@@ -100,9 +100,9 @@ public class AnnouncePeriodic
     @Override
     public boolean stop()
     {
-        plugin.logInfo("AnnouncePeriodic.stop()");
-        if (isActive())
+        if (isEnabled() && isActive())
         {
+            plugin.logInfo("AnnouncePeriodic.stop()");
             plugin.getServer().getScheduler().cancelTask(taskID);
             taskID = 0;
             return true;
