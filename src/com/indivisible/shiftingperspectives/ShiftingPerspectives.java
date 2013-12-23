@@ -19,8 +19,8 @@ public final class ShiftingPerspectives
     protected int taskID = 0;
     private List<Action> actions;
 
-    private static final long UPDATE_FREQ = 1000L;
-    private static final long TOLLERENCE = 200L;
+    private static final long UPDATE_FREQ = 800L;
+    private static final long TOLLERENCE = 100L;
 
 
     //// plugin methods
@@ -103,23 +103,25 @@ public final class ShiftingPerspectives
     {
 
         private JavaPlugin plugin;
-        private long lastCheckedTime = 0;
+        private long expectedTime = 0;
 
         public TimeMonitor(JavaPlugin jPlugin)
         {
             this.plugin = jPlugin;
-            lastCheckedTime = jPlugin.getServer().getWorld("world").getFullTime();
+            expectedTime = jPlugin.getServer().getWorld("world").getFullTime()
+                    + UPDATE_FREQ;
         }
 
         @Override
         public void run()
         {
             long currentFullTime = plugin.getServer().getWorld("world").getFullTime();
-            if (currentFullTime - lastCheckedTime > TOLLERENCE)
+            if (currentFullTime - expectedTime > TOLLERENCE)
             {
                 resetTasks();
+                expectedTime = currentFullTime + UPDATE_FREQ;
             }
-            lastCheckedTime = currentFullTime;
+            expectedTime += UPDATE_FREQ;
 
         }
     }
