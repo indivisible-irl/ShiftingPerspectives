@@ -1,7 +1,7 @@
 ShiftingPerspectives
 ====================
 
-A Minecraft Bukkit Mod fto increase action, keep players on their toes and make sure there is nowhere to hide!
+A Minecraft Bukkit Mod to increase action, keep players on their toes and make sure there is nowhere to hide!
 
 Requirements
 ------------
