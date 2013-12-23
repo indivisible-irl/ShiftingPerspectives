@@ -9,8 +9,8 @@ settings:
     border:
         relocate:
             active: true
-            shift_distance: 100
-            shift_direction: north
+            distance: 100
+            direction: north
         resize:
             active: false
             amount: 100

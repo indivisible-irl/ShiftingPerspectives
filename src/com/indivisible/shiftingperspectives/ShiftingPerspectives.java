@@ -15,7 +15,7 @@ public final class ShiftingPerspectives
     //// data
 
     private AnnouncePeriodic announcer;
-    protected int nextTaskID = Integer.MIN_VALUE;
+    protected int nextUpdateTaskID = Integer.MIN_VALUE;
     private static final long UPDATE_FREQ = 600L;
 
 
@@ -52,9 +52,9 @@ public final class ShiftingPerspectives
     private void stopUpdating()
     {
         this.getServer().getLogger().info("=== stopUpdating()");
-        if (nextTaskID != Integer.MIN_VALUE)
+        if (nextUpdateTaskID != Integer.MIN_VALUE)
         {
-            this.getServer().getScheduler().cancelTask(nextTaskID);
+            this.getServer().getScheduler().cancelTask(nextUpdateTaskID);
         }
     }
 
@@ -78,7 +78,7 @@ public final class ShiftingPerspectives
         Update update = new Update();
         BukkitTask nextTask = this.getServer().getScheduler()
                 .runTaskLater(this, update, UPDATE_FREQ);
-        nextTaskID = nextTask.getTaskId();
+        nextUpdateTaskID = nextTask.getTaskId();
     }
 
     private void performUpdate()
