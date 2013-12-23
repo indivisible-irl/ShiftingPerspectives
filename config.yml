@@ -17,8 +17,8 @@ settings:
     announce:
         periodic:
             active: true            # announce to server periodically that the plugin is installed
-            interval: 1000          # announce every x ticks
-            message: This server runs ShiftingPerspectives. Your stuff isn't safe anymore...
+            interval: 2500          # announce every x ticks
+            message: This server runs ShiftingPerspectives. Nowhere is safe anymore...
         warn_before_shift:
             active: true            # warn server that a border shift is coming
             ticks_before: 1200      # warn x ticks before the shift
