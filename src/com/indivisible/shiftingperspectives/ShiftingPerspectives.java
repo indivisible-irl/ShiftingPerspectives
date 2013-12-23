@@ -32,6 +32,7 @@ public final class ShiftingPerspectives
     @Override
     public void onEnable()
     {
+        this.logInfo("onEnable()");
         this.saveDefaultConfig();
 
         actions = new ArrayList<Action>();
@@ -44,7 +45,7 @@ public final class ShiftingPerspectives
     @Override
     public void onDisable()
     {
-        this.getServer().getLogger().info("=== onDisable()");
+        this.logInfo("onDisable()");
         stopTasks();
         actions = null;
     }
