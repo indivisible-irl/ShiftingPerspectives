@@ -2,6 +2,7 @@ package com.indivisible.shiftingperspectives;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import com.indivisible.shiftingperspectives.actions.Action;
@@ -68,7 +69,7 @@ public final class ShiftingPerspectives
      */
     private void startTasks()
     {
-        this.getServer().getLogger().info("[ShiftingPerspectives] allActions.start()");
+        this.logInfo("allActions.start()");
 
         TimeMonitor timeMonitor = new TimeMonitor(this);
         taskID = this
@@ -89,7 +90,7 @@ public final class ShiftingPerspectives
      */
     private void stopTasks()
     {
-        this.getServer().getLogger().info("[ShiftingPerspectives] allActions.stop()");
+        this.logInfo("allActions.stop()");
         if (isActive())
         {
             this.getServer().getScheduler().cancelTask(taskID);
@@ -140,6 +141,11 @@ public final class ShiftingPerspectives
     public void sayToServer(String msg)
     {
         this.getServer().broadcastMessage(msg);
+    }
+
+    public void sayToPlayer(Player player, String msg)
+    {
+        //TODO method to send message to one player
     }
 
 
