@@ -3,22 +3,27 @@ settings:
         mode: daily
         days: 3
         ticks: 6000
-    start:
+    start_border:
         circular_border: true
         initial_size: 2000
     border:
-        relocate: true
-        shift_distance: 100
-        shift_direction: north
-        resize: false
-        resize_amount: 100
+        relocate:
+            active: true
+            shift_distance: 100
+            shift_direction: north
+        resize:
+            active: false
+            amount: 100
     announce:
-        periodic: true
-        interval: 1000
-        msg_periodic: This server runs ShiftingPerspectives. Your stuff ain't safe no more!
-        warn_before_shift: true
-        time_before_shift: 1200
-        msg_before_shift: Shift in approx %f mins. Watch out!
-        warn_at_risk_users: true
-        warn_at_risk_time_before: 1200
-        msg_warn_user: You are in an area about to be swallowed up. MOVE YOUR ASS!
+        periodic:
+            active: true
+            interval: 1000
+            message: This server runs ShiftingPerspectives. Your stuff ain't safe no more!
+        warn_before_shift:
+            active: true
+            announce_before: 1200
+            message: Shift in approx %f mins. Watch out!
+        warn_at_risk_users:
+            active: true
+            warn_before: 1200
+            message: You are in an area about to be swallowed up. MOVE YOUR ASS!
