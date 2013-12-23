@@ -4,48 +4,44 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
-public class AnnounceBeforeShift
+public class WarnAtRiskUsers
         extends ShiftSubAction
 {
 
     //// data
 
     private JavaPlugin plugin;
-    private int taskID = 0;
     private long[] shiftTiming = null;
 
-    private boolean doAnnounceBeforeShift;
-    private long announceBeforeShiftTime;
-    private String announceBeforeShiftMessage;
+    private boolean doAnnounceAtRisk;
+    private long warnBeforeTicks;
+    private String warnMessage;
+    private int taskID = 0;
 
-    private static String CFG_ANNOUNCE_ACTIVE = "settings.announce.warn_before_shift.active";
-    private static String CFG_ANNOUNCE_TIME = "settings.announce.warn_before_shift.ticks_before";
-    private static String CFG_ANNOUNCE_MESSAGE = "settings.announce.warn_before_shift.message";
-
-    private static long DEFAULT_TIME_BEFORE = 2400L;
-    private static String DEFAULT_ANNOUNCE_MESSAGE = "Border shift soon. Grab your gear and move out!!";
+    private static String CFG_WARN_ACTIVE = "settings.announce.warn_at_risk_users.active";
+    private static String CFG_WARN_BEFORE_TICKS = "settings.warn_at_risk_users.ticks_before";
+    private static String CFG_WARN_MESSAGE = "settings.warn_at_risk_users.message";
+    private static String DEFAULT_WARN_MESSAGE = "You are about to be Shifted, prepare yourself and move %s!";
     private static long MINIMUM_TIME_TO_TRIGGER_EARLY_WARN = 600L;
 
 
     //// constructors & init
 
-    public AnnounceBeforeShift(JavaPlugin jPlugin)
+    public WarnAtRiskUsers(JavaPlugin jPlugin, ShiftBorder shiftBorder)
     {
-        this.doAnnounceBeforeShift = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_ACTIVE,
-                                                                    false);
-        if (doAnnounceBeforeShift)
+        doAnnounceAtRisk = jPlugin.getConfig().getBoolean(CFG_WARN_ACTIVE, true);
+        if (doAnnounceAtRisk)
         {
-            init(jPlugin);
+            this.plugin = jPlugin;
+            init();
         }
     }
 
-    private void init(JavaPlugin jPlugin)
+    private void init()
     {
-        this.plugin = jPlugin;
-        this.announceBeforeShiftTime = plugin.getConfig().getLong(CFG_ANNOUNCE_TIME,
-                                                                  DEFAULT_TIME_BEFORE);
-        this.announceBeforeShiftMessage = plugin.getConfig()
-                .getString(CFG_ANNOUNCE_MESSAGE, DEFAULT_ANNOUNCE_MESSAGE);
+        this.warnBeforeTicks = plugin.getConfig().getLong(CFG_WARN_BEFORE_TICKS);
+        this.warnMessage = plugin.getConfig().getString(CFG_WARN_MESSAGE,
+                                                        DEFAULT_WARN_MESSAGE);
     }
 
 
@@ -53,7 +49,7 @@ public class AnnounceBeforeShift
 
     public boolean isEnabled()
     {
-        return doAnnounceBeforeShift;
+        return doAnnounceAtRisk;
     }
 
     public boolean isActive()
@@ -75,11 +71,10 @@ public class AnnounceBeforeShift
         {
             RunAnnounce runAnnounce = new RunAnnounce();
             long ticksUntilNextShift = shiftTiming[0];
-            if (ticksUntilNextShift - announceBeforeShiftTime <= MINIMUM_TIME_TO_TRIGGER_EARLY_WARN)
+            if (ticksUntilNextShift - warnBeforeTicks <= MINIMUM_TIME_TO_TRIGGER_EARLY_WARN)
             {
                 plugin.getServer().getScheduler().runTask(plugin, runAnnounce);
-                long newNextRun = shiftTiming[0] + shiftTiming[1]
-                        - announceBeforeShiftTime;
+                long newNextRun = shiftTiming[0] + shiftTiming[1] - warnBeforeTicks;
                 taskID = plugin
                         .getServer()
                         .getScheduler()
@@ -95,15 +90,13 @@ public class AnnounceBeforeShift
                         .getScheduler()
                         .scheduleSyncRepeatingTask(plugin,
                                                    runAnnounce,
-                                                   shiftTiming[0]
-                                                           - announceBeforeShiftTime,
+                                                   shiftTiming[0] - warnBeforeTicks,
                                                    shiftTiming[1]);
             }
         }
         return false;
     }
 
-    @Override
     public boolean stop()
     {
         if (isActive())
@@ -115,13 +108,13 @@ public class AnnounceBeforeShift
         return false;
     }
 
-    @Override
     public boolean reset()
     {
         stop();
         start();
         return true;
     }
+
 
     //// announce task
 
@@ -132,9 +125,10 @@ public class AnnounceBeforeShift
         @Override
         public void run()
         {
-            plugin.getServer().broadcastMessage(announceBeforeShiftMessage);
+            //TODO search for users in areas about to get removed and 'pm' them the message.
+            //TODO method to get reverse of movement direction for substitution in message
+            plugin.getServer().broadcastMessage(String.format(warnMessage, "south"));
         }
     }
-
 
 }

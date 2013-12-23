@@ -2,10 +2,11 @@ package com.indivisible.shiftingperspectives;
 
 //import org.bukkit.command.Command;
 //import org.bukkit.command.CommandSender;
-import org.bukkit.World;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+import com.indivisible.shiftingperspectives.actions.Action;
 import com.indivisible.shiftingperspectives.actions.AnnouncePeriodic;
 import com.indivisible.shiftingperspectives.actions.ShiftBorder;
 
@@ -15,11 +16,11 @@ public final class ShiftingPerspectives
 
     //// data
 
-    protected int nextUpdateTaskID = Integer.MIN_VALUE;
-    private static final long UPDATE_FREQ = 600L;
+    protected int taskID = 0;
+    private List<Action> actions;
 
-    private AnnouncePeriodic announcePeriodic;
-    private ShiftBorder shiftBorder;
+    private static final long UPDATE_FREQ = 1000L;
+    private static final long TOLLERENCE = 200L;
 
 
     //// plugin methods
@@ -28,102 +29,99 @@ public final class ShiftingPerspectives
     public void onEnable()
     {
         this.saveDefaultConfig();
-        this.getServer().getLogger().info("=== onEnable()");
 
-        //TODO check settings.mod_active
-        this.announcePeriodic = new AnnouncePeriodic(this);
-        this.shiftBorder = new ShiftBorder(this);
+        actions = new ArrayList<Action>();
+        actions.add(new AnnouncePeriodic(this));
+        actions.add(new ShiftBorder(this));
 
-        startUpdating();
-        //testConfig();
+        startTasks();
     }
 
     @Override
     public void onDisable()
     {
         this.getServer().getLogger().info("=== onDisable()");
-        stopUpdating();
-        this.announcePeriodic = null;
-        this.shiftBorder = null;
-    }
-
-    public void disable()
-    {
-
+        stopTasks();
+        actions = null;
     }
 
 
-    //// enable and disable the scheduling
+    //// enable and disable tasks
 
-    private void startUpdating()
+    private void startTasks()
     {
-        this.getServer().getLogger().info("=== startUpdating()");
-        queueNextUpdateTask();
-    }
+        this.getServer().getLogger().info("[ShiftingPerspectives] allActions.start()");
 
-    private void stopUpdating()
-    {
-        this.getServer().getLogger().info("=== stopUpdating()");
-        if (nextUpdateTaskID != Integer.MIN_VALUE)
+        TimeMonitor timeMonitor = new TimeMonitor(this);
+        taskID = this
+                .getServer()
+                .getScheduler()
+                .scheduleSyncRepeatingTask(this,
+                                           timeMonitor,
+                                           UPDATE_FREQ / 2,
+                                           UPDATE_FREQ);
+        for (Action action : actions)
         {
-            this.getServer().getScheduler().cancelTask(nextUpdateTaskID);
+            action.start();
         }
     }
 
-    //    private void testConfig()
-    //    {
-    //        this.getServer().getLogger().info("=== CONFIG TESTING ");
-    //        String test_str = this.getConfig().getString("settings.timing.mode",
-    //                                                     "DEFAULT VALUE");
-    //        this.getServer().getLogger().info("settings.timing.mode: " + test_str);
-    //        test_str = this.getConfig().getString("settings.announce.msg_periodic",
-    //                                              "DEFAULT VALUE");
-    //        this.getServer().getLogger().info("settings.announce.msg_periodic: " + test_str);
-    //    }
-
-
-    //// update tasks
-
-    private void queueNextUpdateTask()
+    private void stopTasks()
     {
-        this.getServer().getLogger().info("=== queueNextUpdateTask()");
-        Update update = new Update();
-        BukkitTask nextTask = this.getServer().getScheduler()
-                .runTaskLater(this, update, UPDATE_FREQ);
-        nextUpdateTaskID = nextTask.getTaskId();
+        this.getServer().getLogger().info("[ShiftingPerspectives] allActions.stop()");
+        if (isActive())
+        {
+            this.getServer().getScheduler().cancelTask(taskID);
+            taskID = 0;
+        }
+        for (Action action : actions)
+        {
+            action.stop();
+        }
     }
 
-    private void performUpdate()
+    private void resetTasks()
     {
-        this.getServer().getLogger().info("=== performUpdate()");
-        World world = this.getServer().getWorld("world");
-        if (world != null)
+        this.getServer().getLogger().info("[ShiftingPerspectives] allActions.reset()");
+        for (Action action : actions)
         {
-            long now = this.getServer().getWorld("world").getFullTime();
-            announcePeriodic.triggerAction(now);
-            shiftBorder.triggerAction(now);
+            action.reset();
         }
-        else
-        {
-            this.getServer().getLogger().warning("=== Unable to access world");
-        }
-
-        queueNextUpdateTask();
     }
 
 
-    //// runnable
+    private boolean isActive()
+    {
+        return taskID != 0;
+    }
 
-    private class Update
+
+    //// Time watching task
+
+    private class TimeMonitor
             extends BukkitRunnable
     {
+
+        private JavaPlugin plugin;
+        private long lastCheckedTime = 0;
+
+        public TimeMonitor(JavaPlugin jPlugin)
+        {
+            this.plugin = jPlugin;
+            lastCheckedTime = jPlugin.getServer().getWorld("world").getFullTime();
+        }
 
         @Override
         public void run()
         {
-            performUpdate();
-        }
+            long currentFullTime = plugin.getServer().getWorld("world").getFullTime();
+            if (currentFullTime - lastCheckedTime > TOLLERENCE)
+            {
+                resetTasks();
+            }
+            lastCheckedTime = currentFullTime;
 
+        }
     }
 
 }

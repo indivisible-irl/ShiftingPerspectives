@@ -4,9 +4,13 @@ package com.indivisible.shiftingperspectives.actions;
 public abstract class Action
 {
 
+    public abstract boolean isEnabled();
+
     public abstract boolean isActive();
 
-    public abstract boolean triggerAction(long worldTicksTotal);
+    public abstract boolean start();
 
-    protected abstract boolean checkShouldRun(long worldTicksTotal);
+    public abstract boolean stop();
+
+    public abstract boolean reset();
 }

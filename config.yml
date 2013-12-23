@@ -18,12 +18,12 @@ settings:
         periodic:
             active: true
             interval: 1000
-            message: This server runs ShiftingPerspectives. Your stuff ain't safe no more!
+            message: This server runs ShiftingPerspectives. Your stuff isn't safe anymore...
         warn_before_shift:
             active: true
             ticks_before: 1200
-            message: Shift soon. Watch out!
+            message: Shift coming soon. Watch out!
         warn_at_risk_users:
             active: true
             ticks_before: 1200
-            message: You are in an area about to be swallowed up. MOVE YOUR ASS!
+            message: You are about to be Shifted! Grab your stuff and move %s!
