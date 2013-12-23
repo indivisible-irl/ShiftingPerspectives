@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import com.indivisible.shiftingperspectives.actions.AnnouncePeriodic;
+import com.indivisible.shiftingperspectives.actions.ShiftBorder;
 
 public final class ShiftingPerspectives
         extends JavaPlugin
@@ -14,9 +15,11 @@ public final class ShiftingPerspectives
 
     //// data
 
-    private AnnouncePeriodic announcer;
     protected int nextUpdateTaskID = Integer.MIN_VALUE;
     private static final long UPDATE_FREQ = 600L;
+
+    private AnnouncePeriodic announcePeriodic;
+    private ShiftBorder shiftBorder;
 
 
     //// plugin methods
@@ -26,10 +29,13 @@ public final class ShiftingPerspectives
     {
         this.saveDefaultConfig();
         this.getServer().getLogger().info("=== onEnable()");
-        this.announcer = new AnnouncePeriodic(this);
+
+        //TODO check settings.mod_active
+        this.announcePeriodic = new AnnouncePeriodic(this);
+        this.shiftBorder = new ShiftBorder(this);
 
         startUpdating();
-        //        testConfig();
+        //testConfig();
     }
 
     @Override
@@ -37,7 +43,13 @@ public final class ShiftingPerspectives
     {
         this.getServer().getLogger().info("=== onDisable()");
         stopUpdating();
-        this.announcer = null;
+        this.announcePeriodic = null;
+        this.shiftBorder = null;
+    }
+
+    public void disable()
+    {
+
     }
 
 
@@ -87,10 +99,9 @@ public final class ShiftingPerspectives
         World world = this.getServer().getWorld("world");
         if (world != null)
         {
-            this.getServer().getLogger().info("=== World 'world' exists");
             long now = this.getServer().getWorld("world").getFullTime();
-            this.getServer().getLogger().info("=== fullTime: " + now);
-            announcer.triggerAction(now);
+            announcePeriodic.triggerAction(now);
+            shiftBorder.triggerAction(now);
         }
         else
         {

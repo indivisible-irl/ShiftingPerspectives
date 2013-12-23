@@ -25,5 +25,5 @@ settings:
             message: Shift soon. Watch out!
         warn_at_risk_users:
             active: true
-            warn_before: 1200
+            ticks_before: 1200
             message: You are in an area about to be swallowed up. MOVE YOUR ASS!

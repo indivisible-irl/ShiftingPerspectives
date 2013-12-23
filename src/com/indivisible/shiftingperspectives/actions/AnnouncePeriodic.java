@@ -32,8 +32,7 @@ public class AnnouncePeriodic
 
     public AnnouncePeriodic(JavaPlugin jPlugin)
     {
-        doAnnouncePeriodic = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_ACTIVE,
-                                                            false);
+        doAnnouncePeriodic = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_ACTIVE, false);
         jPlugin.getServer().getLogger()
                 .info("=== Periodic Announce: " + doAnnouncePeriodic);
         if (doAnnouncePeriodic)
@@ -45,10 +44,9 @@ public class AnnouncePeriodic
 
     private void init()
     {
-        announcePeriodicInterval = plugin.getConfig()
-                .getInt(CFG_ANNOUNCE_INTERVAL);
-        announcePeriodicMessage = plugin.getConfig()
-                .getString(CFG_ANNOUNCE_MESSAGE, DEFAULT_ANNOUNCE_MESSAGE);
+        announcePeriodicInterval = plugin.getConfig().getInt(CFG_ANNOUNCE_INTERVAL);
+        announcePeriodicMessage = plugin.getConfig().getString(CFG_ANNOUNCE_MESSAGE,
+                                                               DEFAULT_ANNOUNCE_MESSAGE);
     }
 
     //// gets & sets
@@ -60,7 +58,6 @@ public class AnnouncePeriodic
 
     public long getInterval()
     {
-        //TODO more for each announce type
         return announcePeriodicInterval;
     }
 
@@ -93,16 +90,13 @@ public class AnnouncePeriodic
 
     protected boolean checkShouldRun(long worldTicksTotal)
     {
-        if (lastPeriodicAnnounceTicks == 0L) // default value if long set
+        if (lastPeriodicAnnounceTicks == 0L) // default value if long not set
         {
             return true;
         }
-        else
+        else if (worldTicksTotal - lastPeriodicAnnounceTicks > announcePeriodicInterval)
         {
-            if (worldTicksTotal - lastPeriodicAnnounceTicks > announcePeriodicInterval)
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }
