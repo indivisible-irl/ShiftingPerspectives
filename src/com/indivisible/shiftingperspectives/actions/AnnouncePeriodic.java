@@ -3,7 +3,12 @@ package com.indivisible.shiftingperspectives.actions;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-
+/**
+ * Class to announce server-wide in game that the plugin is installed.
+ * 
+ * @author indiv
+ * 
+ */
 public class AnnouncePeriodic
         extends Action
 {
@@ -26,6 +31,11 @@ public class AnnouncePeriodic
 
     //// constructors & init
 
+    /**
+     * Class to announce server-wide in game that the plugin is installed.
+     * 
+     * @param jPlugin
+     */
     public AnnouncePeriodic(JavaPlugin jPlugin)
     {
         doAnnouncePeriodic = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_ACTIVE, false);
@@ -36,6 +46,9 @@ public class AnnouncePeriodic
         }
     }
 
+    /**
+     * Initialise needed data members if Action enabled in configuration.
+     */
     private void init()
     {
         announcePeriodicInterval = plugin.getConfig().getInt(CFG_ANNOUNCE_INTERVAL);
@@ -99,6 +112,12 @@ public class AnnouncePeriodic
 
     //// announce task
 
+    /**
+     * Runnable class to perform the server-wide announcement.
+     * 
+     * @author indiv
+     * 
+     */
     private class RunAnnounce
             extends BukkitRunnable
     {

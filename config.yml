@@ -1,12 +1,12 @@
 settings:
     timing:
         mode: daily
-        days: 3
-        ticks: 6000
-    start_border:
-        circular_border: true
-        initial_size: 2000
+        days: 1
+        ticks: 2000
     border:
+        start:
+            circular_border: true
+            initial_size: 2000
         relocate:
             active: true
             distance: 100
@@ -25,5 +25,5 @@ settings:
             message: Shift coming soon. Watch out!
         warn_at_risk_users:
             active: true
-            ticks_before: 1200
+            ticks_before: 1000
             message: You are about to be Shifted! Grab your stuff and move %s!

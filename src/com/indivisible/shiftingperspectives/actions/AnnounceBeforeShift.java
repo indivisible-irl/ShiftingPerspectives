@@ -3,7 +3,13 @@ package com.indivisible.shiftingperspectives.actions;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-
+/**
+ * Action class to announce server-wide that a Shift is to take place a set
+ * time before it is to occur.
+ * 
+ * @author indiv
+ * 
+ */
 public class AnnounceBeforeShift
         extends ShiftSubAction
 {
@@ -29,6 +35,12 @@ public class AnnounceBeforeShift
 
     //// constructors & init
 
+    /**
+     * Action class to announce server-wide that a Shift is to take place a
+     * set time before it is to occur.
+     * 
+     * @param jPlugin
+     */
     public AnnounceBeforeShift(JavaPlugin jPlugin)
     {
         this.doAnnounceBeforeShift = jPlugin.getConfig().getBoolean(CFG_ANNOUNCE_ACTIVE,
@@ -39,6 +51,11 @@ public class AnnounceBeforeShift
         }
     }
 
+    /**
+     * Initialise the required variables for use if Action enabled.
+     * 
+     * @param jPlugin
+     */
     private void init(JavaPlugin jPlugin)
     {
         this.plugin = jPlugin;
@@ -125,6 +142,13 @@ public class AnnounceBeforeShift
 
     //// announce task
 
+    /**
+     * Runnable class to perform the server-wide warning preceding an upcoming
+     * world border Shift.
+     * 
+     * @author indiv
+     * 
+     */
     private class RunAnnounce
             extends BukkitRunnable
     {

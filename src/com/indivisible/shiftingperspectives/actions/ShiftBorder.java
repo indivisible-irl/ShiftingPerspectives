@@ -6,6 +6,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
+/**
+ * Action class to perform the world border modifications. The guts of the
+ * plugin.
+ * 
+ * @author indiv
+ * 
+ */
 public class ShiftBorder
         extends Action
 {
@@ -24,7 +31,7 @@ public class ShiftBorder
 
     private boolean doRelocate;
     private int relocateDistance;
-    private String relocateDirection;   //ASK Better way to store the direction?
+    private String relocateDirection;   //ASK Better way to store the direction than String? Enum?
 
     private boolean doResize;
     private int resizeAmount;
@@ -48,6 +55,11 @@ public class ShiftBorder
 
     //// constructor & init
 
+    /**
+     * Action class to perform the world border modifications.
+     * 
+     * @param jPlugin
+     */
     public ShiftBorder(JavaPlugin jPlugin)
     {
         this.doRelocate = jPlugin.getConfig().getBoolean(CFG_RELOCATE_ACTIVE, false);
@@ -69,6 +81,9 @@ public class ShiftBorder
         }
     }
 
+    /**
+     * Initialise needed data members for enabled border modification actions.
+     */
     private void initTiming()
     {
         this.shiftTimingMode = plugin.getConfig().getString(CFG_TIMING_MODE, "");
@@ -93,40 +108,62 @@ public class ShiftBorder
         }
     }
 
+    /**
+     * Retrieve and set the necessary values for a once daily Shift.
+     */
     private void initModeDaily()
     {
         plugin.getServer().getLogger()
                 .info("[Shifting Perspectives] Enabling daily Shifts");
     }
 
+    /**
+     * Retrieve and set the necessary values for a Shift every X days.
+     */
     private void initModeDays()
     {
-        plugin.getServer().getLogger()
-                .info("[Shifting Perspectives] Enabling multi-day Shifts");
         this.shiftTimingDays = plugin.getConfig().getInt(CFG_TIMING_DAYS);
         if (shiftTimingDays == 0)
         {
             plugin.getServer()
                     .getLogger()
-                    .warning("[Shifting Perspectives] Incorrect Timing 'days' setting. Disabling plugin");
+                    .warning("[Shifting Perspectives] Incorrect 'timing.days' setting. Disabling plugin");
             plugin.onDisable();
+        }
+        else
+        {
+            plugin.getServer()
+                    .getLogger()
+                    .info(String.format("[Shifting Perspectives] Enabled multi-day Shifts. Run every %d days",
+                                        shiftTimingDays));
         }
     }
 
+    /**
+     * Retrieve and set the necessary values for a Shift every X ticks.
+     */
     private void initModeTicks()
     {
-        plugin.getServer().getLogger()
-                .info("[Shifting Perspectives] Enabling custom tick Shifts");
-        this.shiftTimingTicks = plugin.getConfig().getLong(CFG_TIMING_TICKS);
+        this.shiftTimingTicks = plugin.getConfig().getLong(CFG_TIMING_TICKS, 0L);
         if (shiftTimingTicks == 0L)
         {
             plugin.getServer()
                     .getLogger()
-                    .warning("[Shifting Perspectives] Incorrect Timing 'ticks' setting. Disabling plugin");
+                    .warning("[Shifting Perspectives] Incorrect 'timing.ticks' setting. Disabling plugin");
             plugin.onDisable();
+        }
+        else
+        {
+            plugin.getServer()
+                    .getLogger()
+                    .info(String.format("[Shifting Perspectives] Enabling custom tick Shifts. Run every %d ticks",
+                                        shiftTimingTicks));
         }
     }
 
+    /**
+     * Retrieve and set the necessary values for the world border move action.
+     */
     private void initRelocate()
     {
         this.relocateDistance = plugin.getConfig().getInt(CFG_RELOCATE_DISTANCE);   // 0 if not found
@@ -134,6 +171,10 @@ public class ShiftBorder
                                                               DEFAULT_RELOCATE_DIRECTION);
     }
 
+    /**
+     * Retrieve and set the necessary values for the world border resize
+     * action.
+     */
     private void initResize()
     {
         this.resizeAmount = plugin.getConfig().getInt(CFG_RESIZE_AMOUNT);           // 0 if not found
@@ -190,13 +231,13 @@ public class ShiftBorder
         return false;
     }
 
-
     public boolean stop()
     {
         if (isActive())
         {
             plugin.getServer().getScheduler().cancelTask(taskID);
             taskID = 0;
+            // loop through the announce sub-actions and cancel their tasks if appropriate.
             for (ShiftSubAction action : announceActions)
             {
                 action.stop();
@@ -216,21 +257,44 @@ public class ShiftBorder
 
     //// private methods
 
+    /**
+     * Convenience method to test if Shift is configured to occur once daily.
+     * 
+     * @return
+     */
     private boolean isModeDaily()
     {
         return shiftTimingMode.equals(SHIFT_MODE_DAILY);
     }
 
+    /**
+     * Convenience method to test if Shift is configured to occur every X
+     * days.
+     * 
+     * @return
+     */
     private boolean isModeDays()
     {
         return shiftTimingMode.equals(SHIFT_MODE_DAYS);
     }
 
+    /**
+     * Convenience method to test if Shift is configured to occur every X
+     * ticks.
+     * 
+     * @return
+     */
     private boolean isModeTicks()
     {
         return shiftTimingMode.equals(SHIFT_MODE_TICKS);
     }
 
+    /**
+     * Calculate the ticks to enqueue the Daily Shift task based off current
+     * game time.
+     * 
+     * @return
+     */
     private long[] calcModeDailyTiming()
     {
         long[] triggerTimes = new long[2];
@@ -239,6 +303,12 @@ public class ShiftBorder
         return triggerTimes;
     }
 
+    /**
+     * Calculate the ticks to enqueue the Multi-Day Shift task based off
+     * current game time and last time run.
+     * 
+     * @return
+     */
     private long[] calcModeDaysTiming()
     {
         long[] triggerTimes = new long[2];
@@ -262,6 +332,12 @@ public class ShiftBorder
         return triggerTimes;
     }
 
+    /**
+     * Calculate the ticks to enqueue the Tick based Shift task based off
+     * current game time.
+     * 
+     * @return
+     */
     private long[] calcModeTicksTiming()
     {
         long[] triggerTimes = new long[2];
@@ -285,6 +361,11 @@ public class ShiftBorder
         return triggerTimes;
     }
 
+    /**
+     * Calculate how many ticks until the next Midnight occurs in-game.
+     * 
+     * @return
+     */
     private long ticksUntilNextMidnight()
     {
         long currentDayTime = plugin.getServer().getWorld("world").getTime();
@@ -301,6 +382,9 @@ public class ShiftBorder
 
     //// actions
 
+    /**
+     * Trigger the configured world border modifications.
+     */
     private void performShift()
     {
         if (doRelocate)
@@ -313,6 +397,10 @@ public class ShiftBorder
         }
     }
 
+    /**
+     * Make the changes to the world border needed to move it's location as
+     * set in the configuration.
+     */
     private void performShiftRelocate()
     {
         plugin.getServer()
@@ -323,6 +411,10 @@ public class ShiftBorder
         //TODO make and call class to transpose the world border
     }
 
+    /**
+     * Make the changes to the world border needed to resize it as set in the
+     * configuration.
+     */
     private void performShiftResize()
     {
         plugin.getServer()
@@ -332,9 +424,21 @@ public class ShiftBorder
         //TODO make and call class to resize the world border
     }
 
+    private void resetSpawnLocation()
+    {
+        //TODO calculate the new centre of the accessible world and set the spawn point there.
+        //REM get the max y-value of the location.
+    }
+
 
     //// task
 
+    /**
+     * Runnable class to trigger the Shift Action.
+     * 
+     * @author indiv
+     * 
+     */
     private class RunShift
             extends BukkitRunnable
     {
@@ -344,6 +448,16 @@ public class ShiftBorder
         {
             plugin.getServer().getLogger().info("[Shifting Perspectives] RunShift.run()");
             performShift();
+            resetSpawnLocation();
+            // update lastRun members for future use by reset() (Not needed for Daily)
+            if (isModeDays())
+            {
+                lastDayRun = (int) (plugin.getServer().getWorld("world").getFullTime() / TICKS_FULL_DAY);
+            }
+            else if (isModeTicks())
+            {
+                lastTickRun = plugin.getServer().getWorld("world").getFullTime();
+            }
         }
 
     }

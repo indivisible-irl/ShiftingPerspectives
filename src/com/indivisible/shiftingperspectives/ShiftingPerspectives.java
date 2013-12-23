@@ -1,7 +1,5 @@
 package com.indivisible.shiftingperspectives;
 
-//import org.bukkit.command.Command;
-//import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,6 +8,11 @@ import com.indivisible.shiftingperspectives.actions.Action;
 import com.indivisible.shiftingperspectives.actions.AnnouncePeriodic;
 import com.indivisible.shiftingperspectives.actions.ShiftBorder;
 
+/**
+ * Main class. Monitors world time and sets member Actions to run.
+ * 
+ * @author indiv
+ */
 public final class ShiftingPerspectives
         extends JavaPlugin
 {
@@ -45,9 +48,22 @@ public final class ShiftingPerspectives
         actions = null;
     }
 
+    /**
+     * Check if plugin is actively running and has a task in scheduler.
+     * 
+     * @return
+     */
+    private boolean isActive()
+    {
+        return taskID != 0;
+    }
+
 
     //// enable and disable tasks
 
+    /**
+     * Starts up monitor and child Action tasks.
+     */
     private void startTasks()
     {
         this.getServer().getLogger().info("[ShiftingPerspectives] allActions.start()");
@@ -66,6 +82,9 @@ public final class ShiftingPerspectives
         }
     }
 
+    /**
+     * Stops all running tasks.
+     */
     private void stopTasks()
     {
         this.getServer().getLogger().info("[ShiftingPerspectives] allActions.stop()");
@@ -80,6 +99,10 @@ public final class ShiftingPerspectives
         }
     }
 
+    /**
+     * Rests all tasks. Called when game time changes out of sync with the
+     * TimeMonitor.
+     */
     private void resetTasks()
     {
         this.getServer().getLogger().info("[ShiftingPerspectives] allActions.reset()");
@@ -90,14 +113,14 @@ public final class ShiftingPerspectives
     }
 
 
-    private boolean isActive()
-    {
-        return taskID != 0;
-    }
-
-
     //// Time watching task
 
+    /**
+     * Runnable class to monitor game time for changes and synchronisation.
+     * discrepancies
+     * 
+     * @author indiv
+     */
     private class TimeMonitor
             extends BukkitRunnable
     {

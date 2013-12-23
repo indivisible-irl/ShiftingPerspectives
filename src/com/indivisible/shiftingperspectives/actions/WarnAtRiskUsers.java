@@ -3,7 +3,13 @@ package com.indivisible.shiftingperspectives.actions;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-
+/**
+ * Action class to announce to users that are at risk of getting caught in an
+ * area soon to be inaccessible due to an upcoming world border Shift.
+ * 
+ * @author indiv
+ * 
+ */
 public class WarnAtRiskUsers
         extends ShiftSubAction
 {
@@ -27,6 +33,13 @@ public class WarnAtRiskUsers
 
     //// constructors & init
 
+    /**
+     * Action class to announce to users that are at risk of getting caught in
+     * an area soon to be inaccessible due to an upcoming world border Shift.
+     * 
+     * @param jPlugin
+     * @param shiftBorder
+     */
     public WarnAtRiskUsers(JavaPlugin jPlugin, ShiftBorder shiftBorder)
     {
         doAnnounceAtRisk = jPlugin.getConfig().getBoolean(CFG_WARN_ACTIVE, true);
@@ -37,6 +50,9 @@ public class WarnAtRiskUsers
         }
     }
 
+    /**
+     * Initialise the needed variable values if required.
+     */
     private void init()
     {
         this.warnBeforeTicks = plugin.getConfig().getLong(CFG_WARN_BEFORE_TICKS);
@@ -118,6 +134,13 @@ public class WarnAtRiskUsers
 
     //// announce task
 
+    /**
+     * Runnable class to announce to at risk players that they should vacate
+     * the area they are in.
+     * 
+     * @author indiv
+     * 
+     */
     private class RunAnnounce
             extends BukkitRunnable
     {
@@ -126,7 +149,7 @@ public class WarnAtRiskUsers
         public void run()
         {
             //TODO search for users in areas about to get removed and 'pm' them the message.
-            //TODO method to get reverse of movement direction for substitution in message
+            //TODO method to get reverse of border movement direction (at their location) for substitution in message
             plugin.getServer().broadcastMessage(String.format(warnMessage, "south"));
         }
     }
