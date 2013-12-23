@@ -29,7 +29,7 @@ public final class ShiftingPerspectives
         this.announcer = new Announce(this);
 
         startUpdating();
-        testConfig();
+        //        testConfig();
     }
 
     @Override
@@ -58,16 +58,16 @@ public final class ShiftingPerspectives
         }
     }
 
-    private void testConfig()
-    {
-        this.getServer().getLogger().info("=== CONFIG TESTING ");
-        String test_str = this.getConfig().getString("settings.timing.mode",
-                                                     "DEFAULT VALUE");
-        this.getServer().getLogger().info("settings.timing.mode: " + test_str);
-        test_str = this.getConfig().getString("settings.announce.msg_periodic",
-                                              "DEFAULT VALUE");
-        this.getServer().getLogger().info("settings.announce.msg_periodic: " + test_str);
-    }
+    //    private void testConfig()
+    //    {
+    //        this.getServer().getLogger().info("=== CONFIG TESTING ");
+    //        String test_str = this.getConfig().getString("settings.timing.mode",
+    //                                                     "DEFAULT VALUE");
+    //        this.getServer().getLogger().info("settings.timing.mode: " + test_str);
+    //        test_str = this.getConfig().getString("settings.announce.msg_periodic",
+    //                                              "DEFAULT VALUE");
+    //        this.getServer().getLogger().info("settings.announce.msg_periodic: " + test_str);
+    //    }
 
 
     //// update tasks
@@ -87,7 +87,9 @@ public final class ShiftingPerspectives
         World world = this.getServer().getWorld("world");
         if (world != null)
         {
+            this.getServer().getLogger().info("=== World 'world' exists");
             long now = this.getServer().getWorld("world").getFullTime();
+            this.getServer().getLogger().info("=== fullTime: " + now);
             announcer.triggerAction(now);
         }
         else
@@ -112,20 +114,5 @@ public final class ShiftingPerspectives
         }
 
     }
-
-    //// command handling
-
-    //    @Override
-    //    public boolean onCommand(CommandSender sender,
-    //                             Command command,
-    //                             String label,
-    //                             String[] args)
-    //    {
-    //        // command root to be '/shift <args>'
-    //
-    //        //ASK false if not catching command?
-    //        return false;
-    //    }
-
 
 }
