@@ -23,7 +23,7 @@ public final class ShiftingPerspectives
     protected int taskID = 0;
     private List<Action> actions;
 
-    private static final String LOG_STRING = "[>>>>>>] %s";
+    private static final String LOG_STRING = ">>> %s";
     private static final long UPDATE_FREQ = 800L;
     private static final long TOLLERENCE = 100L;
 
@@ -35,7 +35,7 @@ public final class ShiftingPerspectives
     {
         this.logInfo("onEnable()");
         this.saveDefaultConfig();
-        //ASK ^ reloads configs from file?? doesn't seem to
+        this.reloadConfig();
 
         actions = new ArrayList<Action>();
         actions.add(new AnnouncePeriodic(this));
@@ -126,7 +126,7 @@ public final class ShiftingPerspectives
      */
     public void logInfo(String msg)
     {
-        this.getServer().getLogger().info(String.format(LOG_STRING, msg));
+        this.getLogger().info(String.format(LOG_STRING, msg));
     }
 
     /**
@@ -136,7 +136,7 @@ public final class ShiftingPerspectives
      */
     public void logWarn(String msg)
     {
-        this.getServer().getLogger().warning(String.format(LOG_STRING, msg));
+        this.getLogger().warning(String.format(LOG_STRING, msg));
     }
 
     public void sayToServer(String msg)
@@ -149,8 +149,6 @@ public final class ShiftingPerspectives
         //TODO method to send message to one player
     }
 
-
-    //// Time watching task
 
     /**
      * Runnable class to monitor game time for changes and synchronisation.
