@@ -25,10 +25,10 @@ public class WarnAtRiskPlayers
     private int taskID = 0;
 
     private static String CFG_WARN_ACTIVE = "settings.announce.warn_at_risk_users.active";
-    private static String CFG_WARN_BEFORE_TICKS = "settings.warn_at_risk_users.ticks_before";
+    private static String CFG_WARN_BEFORE_TICKS = "settings.announce.warn_at_risk_users.ticks_before";
     private static String CFG_WARN_MESSAGE = "settings.warn_at_risk_users.message";
     private static String DEFAULT_WARN_MESSAGE = "You are about to be Shifted, prepare yourself and move %s!";
-    private static long MINIMUM_TIME_TO_TRIGGER_EARLY_WARN = 600L;
+    private static long MINIMUM_TICKS_TO_TRIGGER_EARLY_WARN = 600L;
 
 
     //// constructors & init
@@ -56,7 +56,12 @@ public class WarnAtRiskPlayers
      */
     private void init()
     {
-        this.warnBeforeTicks = plugin.getConfig().getLong(CFG_WARN_BEFORE_TICKS);
+        this.warnBeforeTicks = plugin.getConfig().getLong(CFG_WARN_BEFORE_TICKS, 0L);
+        if (this.warnBeforeTicks == 0L)
+        {
+            plugin.logWarn("Incorrect 'announce.warn_at_risk_users.ticks_before' setting. Disabling announcement");
+            this.doAnnounceAtRisk = false;
+        }
         this.warnMessage = plugin.getConfig().getString(CFG_WARN_MESSAGE,
                                                         DEFAULT_WARN_MESSAGE);
     }
@@ -89,9 +94,11 @@ public class WarnAtRiskPlayers
             plugin.logInfo("WarnAtRiskPlayer.start()");
             RunAnnounce runAnnounce = new RunAnnounce();
             long ticksUntilNextShift = shiftTiming[0];
-            if (ticksUntilNextShift - warnBeforeTicks <= MINIMUM_TIME_TO_TRIGGER_EARLY_WARN)
+            if (ticksUntilNextShift - warnBeforeTicks <= MINIMUM_TICKS_TO_TRIGGER_EARLY_WARN)
             {
+                // run announce immediately
                 plugin.getServer().getScheduler().runTask(plugin, runAnnounce);
+                // queue task for following shift
                 long newNextRun = shiftTiming[0] + shiftTiming[1] - warnBeforeTicks;
                 taskID = plugin
                         .getServer()
@@ -122,7 +129,7 @@ public class WarnAtRiskPlayers
 
     public boolean stop()
     {
-        if (isActive())
+        if (isEnabled() && isActive())
         {
             plugin.logInfo("WarnAtRiskPlayer.stop()");
             plugin.getServer().getScheduler().cancelTask(taskID);
