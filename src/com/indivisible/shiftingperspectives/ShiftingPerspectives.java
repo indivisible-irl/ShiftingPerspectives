@@ -146,7 +146,7 @@ public final class ShiftingPerspectives
 
     public void sayToPlayer(Player player, String msg)
     {
-        //TODO method to send message to one player
+    	player.sendMessage(msg);
     }
 
 
